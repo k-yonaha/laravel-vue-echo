@@ -10,4 +10,4 @@ import '@mdi/font/css/materialdesignicons.css'
 const app = createApp(App);
 const vuetify = createVuetify();
 
-app.use(router).use(vuetify).use(store).mount("#app");
+app.use(router).use(vuetify).mount("#app");
