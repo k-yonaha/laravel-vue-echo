@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chat_messages', function (Blueprint $table) {
-            $table->id();
-            $table->text('body');
+            $table->increments('id')->comment('チャットメッセージID');
+            $table->text('message')->comment('メッセージ');
             $table->timestamps();
         });
     }

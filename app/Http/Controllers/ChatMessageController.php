@@ -16,7 +16,8 @@ class ChatMessageController extends Controller
     public function create(Request $request)
     {
         $chatMessage = new ChatMessage();
-        $chatMessage->text = $request->message;
-        $chatMessage->save();
+        $result = $chatMessage->createMessage($request->message);
+
+        return $result->id;
     }
 }
