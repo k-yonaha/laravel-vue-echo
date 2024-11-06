@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,4 +24,11 @@ class ChatMessage extends Model
     {
         return ChatMessage::create(['message' => $message]);
     }
+
+    public function getCreatedAtFormattedAttribute()
+    {
+        return Carbon::parse($this->created_at)->format('Y-m-d H:i:s');
+    }
+
+    protected $appends = ['created_at_formatted'];
 }
