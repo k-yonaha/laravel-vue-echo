@@ -2,7 +2,7 @@
     <div>
         <v-virtual-scroll
             ref="virtualScroll"
-            :height="300"
+            :height="virtualScrollHeight"
             :items="chatMessages"
         >
             <template v-slot:default="{ item }">
@@ -21,27 +21,37 @@
         </v-virtual-scroll>
         <div>
             <textarea v-model="chatMessage"></textarea><br />
-            <button type="button" v-on:click="sendChatMessage()">送信</button>
-            <v-icon :icon="mdiSendCircle" />
+            <v-btn
+                v-on:click="sendChatMessage()"
+                append-icon="mdi-account-circle"
+            >
+                送信
+                <template v-slot:append>
+                    <v-icon :icon="mdiSendCircle" color="warning"></v-icon>
+                </template>
+            </v-btn>
         </div>
     </div>
 </template>
 
 <script setup>
 import axios from "axios";
-import { onMounted, ref, watch } from "vue";
-import { mdiSendCircle } from '@mdi/js';
+import { onMounted, ref, watch, nextTick,} from "vue";
+import { useGoTo } from "vuetify";
+import { mdiSendCircle } from "@mdi/js";
+const goTo = useGoTo();
 const chatMessages = ref([]);
 const chatMessage = ref();
 const virtualScroll = ref(null);
+const virtualScrollHeight = ref(window.innerHeight * 0.8);
 
 // メッセージ取得
-const getMessages = () => {
-    axios
+const getMessages = async () => {
+    await axios
         .get("api/chat")
         .then((response) => {
-            console.log(response);
-            chatMessages.value = response.data;
+            // chatMessages.value = response.data;
+            chatMessages.value = [...response.data];
         })
         .catch((error) => {
             alert("API ERROR");
@@ -66,24 +76,27 @@ const sendChatMessage = () => {
 };
 
 const scrollToBottom = () => {
-    if (virtualScroll.value) {
-        const element = virtualScroll.value.$el;
-        element.scrollTop = element.scrollHeight;
+    const container = virtualScroll.value?.$el.querySelector('.v-virtual-scroll__container');
+    if (container) {
+        const lastItem = container.querySelector('.v-virtual-scroll__item:last-child');
+        if (lastItem) {
+            lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
     }
 };
 
-onMounted(() => {
-    getMessages();
-    scrollToBottom();
-    // メッセージが送信されると発火する
+onMounted(async () => {
+    await getMessages();
+    // // メッセージが送信されると発火する
     Echo.channel("chat").listen("SendChatMessage", (e) => {
-        console.log(e);
-        chatMessages.value.push(e.message);
+        // chatMessages.value.push(e.message);
+        chatMessages.value = [...chatMessages.value,e.message];
     });
 });
 
-watch(chatMessages, () => {
-  scrollToBottom();
+watch(chatMessages, async (value) => {
+    await nextTick();
+    scrollToBottom();
 });
 </script>
 
