@@ -19,24 +19,43 @@
                 </v-row>
             </template>
         </v-virtual-scroll>
-        <div>
-            <textarea v-model="chatMessage"></textarea><br />
-            <v-btn
-                v-on:click="sendChatMessage()"
-                append-icon="mdi-account-circle"
-            >
-                送信
-                <template v-slot:append>
-                    <v-icon :icon="mdiSendCircle" color="warning"></v-icon>
-                </template>
-            </v-btn>
-        </div>
+
+        <v-container>
+            <v-row>
+                <v-col cols="12">
+                    <v-text-field
+                        v-model="chatMessage"
+                        type="text"
+                        variant="outlined"
+                        clearable
+                    >
+                        <template v-slot:append-inner>
+                            <v-fade-transition leave-absolute>
+                                <v-progress-circular
+                                    v-if="sendLoading"
+                                    color="info"
+                                    size="24"
+                                    indeterminate
+                                ></v-progress-circular>
+                                <v-icon
+                                    v-else
+                                    :icon="mdiSendCircle"
+                                    color="warning"
+                                    size="x-large"
+                                    v-on:click="sendChatMessage()"
+                                ></v-icon>
+                            </v-fade-transition>
+                        </template>
+                    </v-text-field>
+                </v-col>
+            </v-row>
+        </v-container>
     </div>
 </template>
 
 <script setup>
 import axios from "axios";
-import { onMounted, ref, watch, nextTick,} from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 import { useGoTo } from "vuetify";
 import { mdiSendCircle } from "@mdi/js";
 const goTo = useGoTo();
@@ -44,6 +63,7 @@ const chatMessages = ref([]);
 const chatMessage = ref();
 const virtualScroll = ref(null);
 const virtualScrollHeight = ref(window.innerHeight * 0.8);
+const sendLoading = ref(false);
 
 // メッセージ取得
 const getMessages = async () => {
@@ -60,14 +80,16 @@ const getMessages = async () => {
 };
 
 // メッセージ送信
-const sendChatMessage = () => {
+const sendChatMessage = async () => {
+    sendLoading.value = true;
     const formData = new FormData();
     formData.append("message", chatMessage.value);
 
-    axios
+    await axios
         .post("api/chat", formData)
         .then((response) => {
             chatMessage.value = "";
+            sendLoading.value = false;
         })
         .catch((error) => {
             alert("API ERROR");
@@ -76,11 +98,15 @@ const sendChatMessage = () => {
 };
 
 const scrollToBottom = () => {
-    const container = virtualScroll.value?.$el.querySelector('.v-virtual-scroll__container');
+    const container = virtualScroll.value.$el.querySelector(
+        ".v-virtual-scroll__container"
+    );
     if (container) {
-        const lastItem = container.querySelector('.v-virtual-scroll__item:last-child');
+        const lastItem = container.querySelector(
+            ".v-virtual-scroll__item:last-child"
+        );
         if (lastItem) {
-            lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            lastItem.scrollIntoView({ behavior: "smooth", block: "end" });
         }
     }
 };
@@ -90,13 +116,13 @@ onMounted(async () => {
     // // メッセージが送信されると発火する
     Echo.channel("chat").listen("SendChatMessage", (e) => {
         // chatMessages.value.push(e.message);
-        chatMessages.value = [...chatMessages.value,e.message];
+        chatMessages.value = [...chatMessages.value, e.message];
     });
 });
 
 watch(chatMessages, async (value) => {
     await nextTick();
-    scrollToBottom();
+    setTimeout(scrollToBottom, 50);
 });
 </script>
 
