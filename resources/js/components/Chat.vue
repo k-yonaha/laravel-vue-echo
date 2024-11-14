@@ -58,7 +58,11 @@ import axios from "axios";
 import { onMounted, ref, watch, nextTick } from "vue";
 import { useGoTo } from "vuetify";
 import { mdiSendCircle } from "@mdi/js";
-const goTo = useGoTo();
+import { useStore } from "vuex";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const store = useStore();
 const chatMessages = ref([]);
 const chatMessage = ref();
 const virtualScroll = ref(null);
@@ -75,6 +79,8 @@ const getMessages = async () => {
         })
         .catch((error) => {
             alert("API ERROR");
+            store.dispatch("auth/logout");
+            router.push('login');
         })
         .finally();
 };

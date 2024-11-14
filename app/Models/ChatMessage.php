@@ -20,9 +20,9 @@ class ChatMessage extends Model
         'id'
     ];
 
-    public function createMessage($message)
+    public function createMessage($userId, $message)
     {
-        return ChatMessage::create(['message' => $message]);
+        return ChatMessage::create(['user_id' => $userId, 'message' => $message]);
     }
 
     public function getCreatedAtFormattedAttribute()

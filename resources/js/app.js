@@ -7,6 +7,7 @@ import router from "./router";
 import "vuetify/dist/vuetify.min.css";
 // import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from "vuetify/iconsets/mdi-svg";
+import store from './store';
 
 const app = createApp(App);
 const vuetify = createVuetify({
@@ -19,4 +20,4 @@ const vuetify = createVuetify({
     },
 });
 
-app.use(router).use(vuetify).mount("#app");
+app.use(store).use(router).use(vuetify).mount("#app");

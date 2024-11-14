@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->increments('id')->comment('チャットメッセージID');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('ユーザーID');
             $table->text('message')->comment('メッセージ');
             $table->timestamps();
         });
