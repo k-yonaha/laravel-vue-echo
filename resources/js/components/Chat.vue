@@ -4,18 +4,44 @@
             ref="virtualScroll"
             :height="virtualScrollHeight"
             :items="chatMessages"
+            class="mx-2"
         >
             <template v-slot:default="{ item }">
-                <v-row no-gutters class="justify-end align-center mt-4">
+                <v-row
+                    v-if="item.user_id === user.id"
+                    no-gutters
+                    class="justify-end align-center mt-4"
+                >
                     <!-- 日時部分 (小さい文字) -->
                     <span class="message-time">{{
                         item.created_at_formatted
                     }}</span>
 
                     <!-- メッセージ部分 -->
-                    <v-chip variant="outlined" class="ml-2">
+                    <v-chip color="blue" variant="elevated" class="ml-2">
                         {{ item.message }}
                     </v-chip>
+                </v-row>
+                <v-row
+                    v-else
+                    no-gutters
+                    class="justify-start align-center mt-4"
+                >
+                    <v-col cols="12">
+                        <span class="message-user">{{
+                            item.user.name
+                        }}</span></v-col
+                    >
+                    <v-col>
+                        <!-- メッセージ部分 -->
+                        <v-chip color="blue" class="mr-2">
+                            {{ item.message }}
+                        </v-chip>
+                        <!-- 日時部分 (小さい文字) -->
+                        <span class="message-time">{{
+                            item.created_at_formatted
+                        }}</span>
+                    </v-col>
                 </v-row>
             </template>
         </v-virtual-scroll>
@@ -59,7 +85,7 @@ import { onMounted, ref, watch, nextTick } from "vue";
 import { useGoTo } from "vuetify";
 import { mdiSendCircle } from "@mdi/js";
 import { useStore } from "vuex";
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const store = useStore();
@@ -68,6 +94,7 @@ const chatMessage = ref();
 const virtualScroll = ref(null);
 const virtualScrollHeight = ref(window.innerHeight * 0.8);
 const sendLoading = ref(false);
+const user = store.getters["auth/user"];
 
 // メッセージ取得
 const getMessages = async () => {
@@ -80,7 +107,7 @@ const getMessages = async () => {
         .catch((error) => {
             alert("API ERROR");
             store.dispatch("auth/logout");
-            router.push('login');
+            router.push("login");
         })
         .finally();
 };
@@ -133,6 +160,10 @@ watch(chatMessages, async (value) => {
 </script>
 
 <style scoped>
+.message-user {
+    font-size: 0.75rem;
+    color: grey;
+}
 .message-time {
     font-size: 0.55rem;
     color: grey;

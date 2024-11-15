@@ -19,6 +19,8 @@ class ChatMessage extends Model
     protected $guarded = [
         'id'
     ];
+    
+    protected $appends = ['created_at_formatted'];
 
     public function createMessage($userId, $message)
     {
@@ -30,5 +32,8 @@ class ChatMessage extends Model
         return Carbon::parse($this->created_at)->format('Y-m-d H:i:s');
     }
 
-    protected $appends = ['created_at_formatted'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

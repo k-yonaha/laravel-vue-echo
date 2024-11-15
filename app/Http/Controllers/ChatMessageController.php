@@ -18,7 +18,7 @@ class ChatMessageController extends Controller
      */
     public function index()
     {
-        $chatMessages = ChatMessage::orderBy('id', 'asc')->get();
+        $chatMessages = ChatMessage::with('user')->orderBy('id', 'asc')->get();
         return $chatMessages;
     }
 
