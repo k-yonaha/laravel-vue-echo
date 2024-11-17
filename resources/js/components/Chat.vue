@@ -1,90 +1,117 @@
 <template>
     <div>
-        <v-virtual-scroll
-            ref="virtualScroll"
-            :height="virtualScrollHeight"
-            :items="chatMessages"
-            class="mx-2"
-        >
-            <template v-slot:default="{ item }">
-                <v-row
-                    v-if="item.user_id === user.id"
-                    no-gutters
-                    class="justify-end align-center mt-4"
-                >
-                    <!-- 日時部分 (小さい文字) -->
-                    <span class="message-time">{{
-                        item.created_at_formatted
-                    }}</span>
-
-                    <!-- メッセージ部分 -->
-                    <v-chip color="blue" variant="elevated" class="ml-2">
-                        {{ item.message }}
-                    </v-chip>
-                </v-row>
-                <v-row
-                    v-else
-                    no-gutters
-                    class="justify-start align-center mt-4"
-                >
-                    <v-col cols="1">
-                        <v-avatar color="indigo">
-                            <v-icon dark :icon="mdiAccountCircle"> </v-icon>
-                        </v-avatar>
-                    </v-col>
-                    <v-col cols="11">
-                        <v-row
-                            no-gutters
-                            class="justify-start align-center"
-                        >
-                            <v-col cols="12">
-                                <span class="message-user">{{
-                                    item.user.name
-                                }}</span></v-col
-                            >
-                            <v-col cols="12">
-                                <!-- メッセージ部分 -->
-                                <v-chip color="blue" class="mr-2">
-                                    {{ item.message }}
-                                </v-chip>
-                                <!-- 日時部分 (小さい文字) -->
-                                <span class="message-time">{{
-                                    item.created_at_formatted
-                                }}</span>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-            </template>
-        </v-virtual-scroll>
-
         <v-container>
             <v-row>
+                <v-virtual-scroll
+                    ref="virtualScroll"
+                    :height="virtualScrollHeight"
+                    :items="chatMessages"
+                    class="mx-2"
+                >
+                    <template v-slot:default="{ item }">
+                        <v-row
+                            v-if="item.user_id === user.id"
+                            no-gutters
+                            class="justify-end align-center mt-4"
+                        >
+                            <!-- 日時部分 (小さい文字) -->
+                            <span class="message-time">{{
+                                item.created_at_formatted
+                            }}</span>
+
+                            <!-- メッセージ部分 -->
+                            <div
+                                class="bg-blue ml-2 rounded-xl px-4 py-3"
+                                rounded="pill"
+                            >
+                                <span
+                                    v-html="formattedMessage(item.message)"
+                                ></span>
+                            </div>
+                        </v-row>
+                        <v-row
+                            v-else
+                            no-gutters
+                            class="justify-start align-center mt-4"
+                        >
+                            <v-col
+                                cols="auto"
+                                md="1"
+                                sm="1"
+                                xs="4"
+                                class="px-2"
+                            >
+                                <v-avatar color="indigo">
+                                    <v-icon :icon="mdiAccountCircle"> </v-icon>
+                                </v-avatar>
+                            </v-col>
+                            <v-col cols="auto" md="11" sm="9" xs="8">
+                                <v-row
+                                    no-gutters
+                                    class="justify-start align-center"
+                                >
+                                    <v-col cols="12">
+                                        <span class="message-user">{{
+                                            item.user.name
+                                        }}</span></v-col
+                                    >
+                                    <v-col cols="">
+                                        <!-- メッセージ部分 -->
+                                        <div
+                                            class="bg-blue rounded-xl px-4 py-3 align-self-start"
+                                            rounded="pill"
+                                            style="width: fit-content"
+                                        >
+                                            <span
+                                                v-html="
+                                                    formattedMessage(
+                                                        item.message
+                                                    )
+                                                "
+                                            ></span>
+                                        </div>
+                                        <!-- 日時部分 (小さい文字) -->
+                                        <span class="message-time">{{
+                                            item.created_at_formatted
+                                        }}</span>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-row>
+                    </template>
+                </v-virtual-scroll>
+            </v-row>
+            <v-row>
                 <v-col cols="12">
-                    <v-text-field
-                        v-model="chatMessage"
-                        type="text"
-                        variant="outlined"
-                        clearable
-                    >
-                        <template v-slot:append-inner>
-                            <v-fade-transition leave-absolute>
-                                <v-progress-circular
-                                    v-if="sendLoading"
-                                    color="info"
-                                    size="24"
-                                    indeterminate
-                                ></v-progress-circular>
-                                <v-icon
-                                    v-else
-                                    :icon="mdiSendCircle"
-                                    color="warning"
-                                    size="x-large"
-                                    v-on:click="sendChatMessage()"
-                                ></v-icon>
-                            </v-fade-transition>
-                        </template>
-                    </v-text-field>
+                    <v-form v-model="form">
+                        <v-textarea
+                            v-model="chatMessage"
+                            type="text"
+                            variant="outlined"
+                            clearable
+                            :rules="[textFieldMaxLength]"
+                            rows="1"
+                            auto-grow
+                        >
+                            <template v-slot:append-inner>
+                                <v-fade-transition leave-absolute>
+                                    <v-progress-circular
+                                        v-if="sendLoading"
+                                        color="info"
+                                        size="24"
+                                        indeterminate
+                                    ></v-progress-circular>
+                                    <v-icon
+                                        v-else
+                                        :icon="mdiSendCircle"
+                                        color="warning"
+                                        size="x-large"
+                                        v-on:click="sendChatMessage()"
+                                    ></v-icon>
+                                </v-fade-transition>
+                            </template>
+                        </v-textarea>
+                    </v-form>
                 </v-col>
             </v-row>
         </v-container>
@@ -107,6 +134,7 @@ const virtualScroll = ref(null);
 const virtualScrollHeight = ref(window.innerHeight * 0.8);
 const sendLoading = ref(false);
 const user = store.getters["auth/user"];
+const form = ref(false);
 
 // メッセージ取得
 const getMessages = async () => {
@@ -124,6 +152,7 @@ const getMessages = async () => {
 
 // メッセージ送信
 const sendChatMessage = async () => {
+    if (!form.value) return;
     sendLoading.value = true;
     const formData = new FormData();
     formData.append("message", chatMessage.value);
@@ -135,6 +164,7 @@ const sendChatMessage = async () => {
             sendLoading.value = false;
         })
         .catch((error) => {
+            alert("メッセージ送信に失敗しました");
             console.log(error);
         })
         .finally();
@@ -167,6 +197,15 @@ watch(chatMessages, async (value) => {
     // v-virtual-scrollの反映が遅いので遅延させる
     setTimeout(scrollToBottom, 50);
 });
+
+const textFieldMaxLength = (value) => {
+    const message = value || "";
+    return message.length <= 255 || "255文字以内で入力してください";
+};
+
+function formattedMessage(message) {
+    return message.replace(/\n/g, "<br>");
+}
 </script>
 
 <style scoped>
