@@ -27,20 +27,32 @@
                     no-gutters
                     class="justify-start align-center mt-4"
                 >
-                    <v-col cols="12">
-                        <span class="message-user">{{
-                            item.user.name
-                        }}</span></v-col
-                    >
-                    <v-col>
-                        <!-- メッセージ部分 -->
-                        <v-chip color="blue" class="mr-2">
-                            {{ item.message }}
-                        </v-chip>
-                        <!-- 日時部分 (小さい文字) -->
-                        <span class="message-time">{{
-                            item.created_at_formatted
-                        }}</span>
+                    <v-col cols="1">
+                        <v-avatar color="indigo">
+                            <v-icon dark :icon="mdiAccountCircle"> </v-icon>
+                        </v-avatar>
+                    </v-col>
+                    <v-col cols="11">
+                        <v-row
+                            no-gutters
+                            class="justify-start align-center"
+                        >
+                            <v-col cols="12">
+                                <span class="message-user">{{
+                                    item.user.name
+                                }}</span></v-col
+                            >
+                            <v-col cols="12">
+                                <!-- メッセージ部分 -->
+                                <v-chip color="blue" class="mr-2">
+                                    {{ item.message }}
+                                </v-chip>
+                                <!-- 日時部分 (小さい文字) -->
+                                <span class="message-time">{{
+                                    item.created_at_formatted
+                                }}</span>
+                            </v-col>
+                        </v-row>
                     </v-col>
                 </v-row>
             </template>
@@ -83,7 +95,7 @@
 import axios from "axios";
 import { onMounted, ref, watch, nextTick } from "vue";
 import { useGoTo } from "vuetify";
-import { mdiSendCircle } from "@mdi/js";
+import { mdiSendCircle, mdiAccountCircle } from "@mdi/js";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -105,9 +117,7 @@ const getMessages = async () => {
             chatMessages.value = [...response.data];
         })
         .catch((error) => {
-            alert("API ERROR");
-            store.dispatch("auth/logout");
-            router.push("login");
+            console.log(error);
         })
         .finally();
 };
@@ -125,7 +135,7 @@ const sendChatMessage = async () => {
             sendLoading.value = false;
         })
         .catch((error) => {
-            alert("API ERROR");
+            console.log(error);
         })
         .finally();
 };
@@ -148,7 +158,6 @@ onMounted(async () => {
     await getMessages();
     // // メッセージが送信されると発火する
     Echo.channel("chat").listen("SendChatMessage", (e) => {
-        // chatMessages.value.push(e.message);
         chatMessages.value = [...chatMessages.value, e.message];
     });
 });
