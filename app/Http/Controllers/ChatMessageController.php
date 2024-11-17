@@ -33,7 +33,7 @@ class ChatMessageController extends Controller
         $user = Auth::user();
         $chatMessage = new ChatMessage();
         $result = $chatMessage->createMessage($user->id, $request->message);
-        event(new SendChatMessage($result));
+        event(new SendChatMessage(ChatMessage::with('user')->where('id',$result->id)->first()));
 
         return $result->id;
     }
