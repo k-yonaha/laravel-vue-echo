@@ -164,6 +164,7 @@ onMounted(async () => {
 
 watch(chatMessages, async (value) => {
     await nextTick();
+    // v-virtual-scrollの反映が遅いので遅延させる
     setTimeout(scrollToBottom, 50);
 });
 </script>
