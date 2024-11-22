@@ -1,0 +1,44 @@
+name: Deploy Laravel App to EC2 using SSM
+
+on:
+  push:
+    branches:
+      - main  # mainブランチへのpushをトリガー
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # AWS CLIの設定
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # SSMを使ってデプロイコマンドを実行
+      - name: Deploy using SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids ${{ secrets.INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy Laravel Application" \
+            --parameters 'commands=[
+              "cd /var/www/laravel-vue-echo",
+              "git checkout main",
+              "git pull origin main",
+              "composer install --no-dev --optimize-autoloader",
+              "php artisan migrate --force",
+              "php artisan config:cache",
+              "php artisan route:cache",
+              "php artisan view:cache",
+              "npm run build",
+              "sudo systemctl reload nginx"
+            ]' \
+            --output text
