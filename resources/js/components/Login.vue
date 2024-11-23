@@ -15,7 +15,7 @@
                     :rules="[required]"
                     class="mb-2"
                     label="メールアドレス"
-                    placeholder="メールアドレスを入力してください"
+                    placeholder=""
                     clearable
                 ></v-text-field>
 
