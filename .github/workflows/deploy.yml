@@ -58,11 +58,32 @@ jobs:
           fi
 
           # コマンド完了を待機
+          set +e  # 待機失敗時も後続の処理を継続
           aws ssm wait command-executed \
             --command-id "$command_id" \
             --instance-id ${{ secrets.INSTANCE_ID }}
+          wait_status=$?
+          set -e
 
-          echo "Command execution completed."
+          if [ $wait_status -ne 0 ]; then
+            echo "Waiter failed, fetching command details..."
+            result=$(aws ssm get-command-invocation \
+              --command-id "$command_id" \
+              --instance-id ${{ secrets.INSTANCE_ID }} \
+              --output json)
+
+            echo "Command Result:"
+            echo "$result"
+
+            # エラー内容を表示
+            stderr=$(echo "$result" | jq -r '.StandardErrorContent')
+            echo "---- Standard Error ----"
+            echo "$stderr"
+
+            exit 1
+          fi
+
+          echo "Command execution completed successfully."
 
       # 実行結果を取得して表示
       - name: Fetch and Display SSM Command Result
