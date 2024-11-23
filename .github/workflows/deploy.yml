@@ -57,16 +57,22 @@ jobs:
             exit 1
           fi
 
-          # コマンド実行結果の取得
-          result=$(aws ssm list-command-invocations \
+          # コマンド完了を待機
+          aws ssm wait command-executed \
             --command-id "$command_id" \
-            --details \
+            --instance-id ${{ secrets.INSTANCE_ID }}
+
+          echo "Command execution completed."
+
+      # 実行結果を取得して表示
+      - name: Fetch and Display SSM Command Result
+        run: |
+          # 結果を取得
+          result=$(aws ssm get-command-invocation \
+            --command-id "$command_id" \
+            --instance-id ${{ secrets.INSTANCE_ID }} \
             --output json)
 
-          echo "Command result: $result"
-
-      # デプロイ結果を表示
-      - name: Display SSM Command Result
-        run: |
-          echo "Command executed successfully, check the result below:"
-          echo "${{ steps.ssm_deploy.outputs.result }}"
+          # 出力を表示
+          echo "Command Result:"
+          echo "$result"
