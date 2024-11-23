@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # リポジトリをチェックアウト
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       # AWS CLIの設定
       - name: Configure AWS credentials
@@ -38,6 +35,7 @@ jobs:
               "php artisan config:cache",
               "php artisan route:cache",
               "php artisan view:cache",
+              "npm run install",
               "npm run build",
               "sudo systemctl reload nginx"
             ]' \
