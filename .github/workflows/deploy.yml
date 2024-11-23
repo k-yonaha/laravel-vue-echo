@@ -28,6 +28,7 @@ jobs:
             --comment "Deploy Laravel Application" \
             --parameters '{"commands": [
               "set -eux",
+              "git config --global --add safe.directory /var/www/laravel-vue-echo", 
               "cd /var/www/laravel-vue-echo",
               "git checkout main",
               "git pull origin main",
