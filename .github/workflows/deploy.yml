@@ -42,3 +42,19 @@ jobs:
             ]}' \
             --output json \
             --query "Command.CommandId"
+
+          echo "Command ID: $command_id"
+          
+          # コマンド実行結果の取得
+          result=$(aws ssm list-command-invocations \
+            --command-id "$command_id" \
+            --details \
+            --output json)
+          
+          echo "Command result: $result"
+
+      # デプロイ結果を表示
+      - name: Display SSM Command Result
+        run: |
+          echo "Command executed successfully, check the result below:"
+          echo "${{ steps.ssm_deploy.outputs.result }}"
