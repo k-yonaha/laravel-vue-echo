@@ -27,6 +27,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Deploy Laravel Application" \
             --parameters 'commands=[
+              "set -eux",  # エラー時にスクリプトを停止し、ログを表示
               "cd /var/www/laravel-vue-echo",
               "git checkout main",
               "git pull origin main",
@@ -39,4 +40,5 @@ jobs:
               "npm run build",
               "sudo systemctl reload nginx"
             ]' \
-            --output text
+            --output json \
+            --query "Command.CommandId"
