@@ -43,15 +43,21 @@ jobs:
             --output json \
             --query "Command.CommandId"
 
-          echo "Command ID: $command_id"
-          
-          # コマンド実行結果の取得
-          result=$(aws ssm list-command-invocations \
-            --command-id "$command_id" \
-            --details \
-            --output json)
-          
-          echo "Command result: $result"
+      echo "Command ID: $command_id"
+
+      # command_idが空でないかを確認
+      if [ -z "$command_id" ]; then
+        echo "Error: Command ID is empty"
+        exit 1
+      fi
+
+      # コマンド実行結果の取得
+      result=$(aws ssm list-command-invocations \
+        --command-id "$command_id" \
+        --details \
+        --output json)
+
+      echo "Command result: $result"
 
       # デプロイ結果を表示
       - name: Display SSM Command Result
