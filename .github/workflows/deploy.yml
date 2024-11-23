@@ -26,8 +26,8 @@ jobs:
             --instance-ids ${{ secrets.INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy Laravel Application" \
-            --parameters 'commands=[
-              "set -eux",  # エラー時にスクリプトを停止し、ログを表示
+            --parameters '{"commands": [
+              "set -eux",
               "cd /var/www/laravel-vue-echo",
               "git checkout main",
               "git pull origin main",
@@ -39,6 +39,6 @@ jobs:
               "npm run install",
               "npm run build",
               "sudo systemctl reload nginx"
-            ]' \
+            ]}' \
             --output json \
             --query "Command.CommandId"
