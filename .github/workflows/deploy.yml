@@ -89,7 +89,7 @@ jobs:
       # 実行結果を取得して表示
       - name: Fetch and Display SSM Command Result
         run: |
-          # 結果を取得
+          # 結果を取得1
           result=$(aws ssm get-command-invocation \
             --command-id "$command_id" \
             --instance-id ${{ secrets.INSTANCE_ID }} \
@@ -102,7 +102,7 @@ jobs:
       # エラー詳細と標準出力を表示
       - name: Handle SSM Command Execution Result
         run: |
-          # 結果を取得
+          # 結果を取得2
           result=$(aws ssm get-command-invocation \
             --command-id "$command_id" \
             --instance-id ${{ secrets.INSTANCE_ID }} \
