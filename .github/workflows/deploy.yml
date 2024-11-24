@@ -59,12 +59,10 @@ jobs:
           fi
 
           # コマンド完了を待機
-          set +e  # 待機失敗時も後続の処理を継続
           aws ssm wait command-executed \
             --command-id "$command_id" \
             --instance-id ${{ secrets.INSTANCE_ID }}
           wait_status=$?
-          set -e
 
           if [ $wait_status -ne 0 ]; then
             echo "Waiter failed, fetching command details..."
