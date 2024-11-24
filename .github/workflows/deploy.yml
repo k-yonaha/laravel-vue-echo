@@ -84,9 +84,14 @@ jobs:
 
           echo "Command execution completed successfully."
 
+          # $command_id を後続ステップで使えるようエクスポート
+          echo "COMMAND_ID=$command_id" >> $GITHUB_ENV
+
       # 実行結果を取得して表示
       - name: Fetch and Display SSM Command Result
         run: |
+          echo "COMMAND_ID: $COMMAND_ID"
+          echo "COMMAND_ID: $command_id"
           # 結果を取得1
           result=$(aws ssm get-command-invocation \
             --command-id "$command_id" \
