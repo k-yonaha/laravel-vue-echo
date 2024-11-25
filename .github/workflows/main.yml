@@ -43,7 +43,8 @@ jobs:
               "npm install",
               "npm run build",
               "sudo systemctl reload nginx"
-          ]}' \
+            ]}' \
+            --region ${{ secrets.AWS_REGION }} \
           --output json)
 
           echo "Response from send-command: $response"
